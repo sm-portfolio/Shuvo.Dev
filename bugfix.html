@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Fix Demo | Before vs After</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { dark: '#0f172a', primary: '#6366f1', red: '#ef4444', green: '#22c55e' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Buggy Styles (ইচ্ছাকৃতভাবে ডিজাইন নষ্ট করা হয়েছে) */
+        .buggy-layout .cart-card {
+            border: 2px solid red;
+            transform: rotate(1deg);
+            overflow: hidden;
+        }
+        .buggy-layout .checkout-btn {
+            position: absolute; /* Button overlapping content */
+            bottom: 10px;
+            right: 50%;
+            background-color: gray !important;
+            cursor: not-allowed;
+        }
+        .buggy-layout .price-text {
+            color: red;
+            font-size: 10px; /* Too small */
+        }
+        
+        /* Fixed Styles (ফিক্স করার পর যা হবে) */
+        .fixed-layout .cart-card {
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .fixed-layout .checkout-btn {
+            position: static;
+            width: 100%;
+            background-color: #6366f1;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-white min-h-screen font-sans flex flex-col items-center justify-center p-4">
+
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-5xl font-bold mb-2">Live Bug Fix Demo</h1>
+        <p class="text-gray-400">Toggle the switch to see the code transformation.</p>
+    </div>
+
+    <!-- Toggle Switch (Controller) -->
+    <div class="bg-gray-800 p-2 rounded-full flex items-center gap-4 mb-10 border border-gray-700 shadow-xl">
+        <span class="pl-4 text-sm font-bold" id="status-text">🔴 CURRENT STATUS: BUGGY VERSION</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="fixToggle" class="sr-only peer" onchange="toggleMode()">
+            <div class="w-14 h-7 bg-red-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+        </label>
+    </div>
+
+    <!-- Simulation Container -->
+    <div id="demo-container" class="buggy-layout w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl p-6 relative min-h-[500px]">
+        
+        <!-- Header inside Phone -->
+        <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+            <div class="text-xl font-bold"><i class="fas fa-shopping-bag text-brand-primary mr-2"></i>My Cart</div>
+            <div class="text-sm text-gray-500">Item: #492</div>
+        </div>
+
+        <!-- Product Item -->
+        <div class="cart-card bg-gray-800 p-4 rounded-xl mb-6 flex gap-4 items-center">
+            <img src="https://placehold.co/100x100/334155/FFF?text=Shoe" class="w-20 h-20 rounded-lg object-cover">
+            <div class="flex-1">
+                <h3 class="font-bold text-lg">Nike Air Max</h3>
+                <p class="text-gray-400 text-xs mb-2">Size: 42 | Color: Black</p>
+                <div class="flex justify-between items-center">
+                    <span class="price-text font-bold text-xl">$150.00</span>
+                    
+                    <!-- Bug: Input field broken in buggy mode -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">Qty:</span>
+                        <input type="number" id="qty" value="1" min="1" class="w-12 bg-gray-700 rounded p-1 text-center" onchange="calculateTotal()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping & Total -->
+        <div class="space-y-3 mb-8">
+            <div class="flex justify-between text-gray-400">
+                <span>Subtotal</span>
+                <span>$150.00</span>
+            </div>
+            <div class="flex justify-between text-gray-400">
+                <span>Shipping</span>
+                <span>$20.00</span>
+            </div>
+            <div class="h-px bg-gray-700 my-2"></div>
+            <div class="flex justify-between font-bold text-2xl">
+                <span>Total</span>
+                <!-- The Result Display -->
+                <span id="total-price" class="text-brand-primary">$15020.00</span> 
+            </div>
+            <!-- Error Message Container -->
+            <div id="error-msg" class="text-red-500 text-xs mt-2 italic block">
+                ⚠ Console Error: Type coercion failed in calculation logic.
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <button onclick="handleCheckout()" class="checkout-btn py-4 rounded-xl font-bold text-white shadow-lg shadow-brand-primary/20 transition-all">
+            Proceed to Checkout <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+
+    </div>
+
+    <!-- Explanation Box -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+        <div class="bg-red-500/10 border border-red-500/30 p-6 rounded-xl">
+            <h3 class="text-red-400 font-bold mb-2"><i class="fas fa-bug mr-2"></i>The Problems (Buggy Mode)</h3>
+            <ul class="list-disc list-inside text-gray-400 text-sm space-y-2">
+                <li><strong>Logic Error:</strong> JavaScript String Concatenation bug ($150 + $20 = $15020).</li>
+                <li><strong>UI Issue:</strong> Checkout button is misaligned (CSS Positioning error).</li>
+                <li><strong>UX Issue:</strong> Checkout button is disabled/unclickable.</li>
+            </ul>
+        </div>
+        <div class="bg-green-500/10 border border-green-500/30 p-6 rounded-xl">
+            <h3 class="text-green-400 font-bold mb-2"><i class="fas fa-check-circle mr-2"></i>The Solution (Fixed Mode)</h3>
+            <ul class="list-disc list-inside text-gray-400 text-sm space-y-2">
+                <li><strong>Logic Fix:</strong> Parsed integers correctly ($150 + $20 = $170).</li>
+                <li><strong>UI Fix:</strong> Removed absolute positioning, used Flexbox.</li>
+                <li><strong>UX Fix:</strong> Button enabled with success interaction.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Back to Portfolio -->
+    <a href="index.html" class="mt-8 text-gray-500 hover:text-white transition">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Portfolio
+    </a>
+
+    <script>
+        const container = document.getElementById('demo-container');
+        const toggle = document.getElementById('fixToggle');
+        const statusText = document.getElementById('status-text');
+        const totalPriceEl = document.getElementById('total-price');
+        const errorMsg = document.getElementById('error-msg');
+        const qtyInput = document.getElementById('qty');
+
+        let isFixed = false;
+        const price = 150;
+        const shipping = 20;
+
+        function toggleMode() {
+            isFixed = toggle.checked;
+
+            if (isFixed) {
+                // Apply Fixes
+                container.classList.remove('buggy-layout');
+                container.classList.add('fixed-layout');
+                statusText.innerHTML = "🟢 STATUS: FIXED & OPTIMIZED";
+                statusText.classList.remove('text-red-400');
+                statusText.classList.add('text-green-400');
+                errorMsg.style.display = 'none';
+                calculateTotal();
+            } else {
+                // Revert to Bugs
+                container.classList.remove('fixed-layout');
+                container.classList.add('buggy-layout');
+                statusText.innerHTML = "🔴 STATUS: BUGGY VERSION";
+                statusText.classList.remove('text-green-400');
+                statusText.classList.add('text-red-400');
+                errorMsg.style.display = 'block';
+                calculateTotal();
+            }
+        }
+
+        function calculateTotal() {
+            const qty = qtyInput.value;
+
+            if (isFixed) {
+                // Correct Logic
+                const total = (price * parseInt(qty)) + shipping;
+                totalPriceEl.textContent = "$" + total.toFixed(2);
+                totalPriceEl.classList.remove('text-red-500');
+                totalPriceEl.classList.add('text-brand-primary');
+            } else {
+                // Buggy Logic (String Concatenation)
+                // ইমাজিন করুন ডেভেলপার ভুল করে স্ট্রিং যোগ করেছে
+                const subtotal = price * qty; 
+                const total = subtotal + "" + shipping; // This creates "15020"
+                totalPriceEl.textContent = "$" + total + ".00";
+                totalPriceEl.classList.remove('text-brand-primary');
+                totalPriceEl.classList.add('text-red-500');
+            }
+        }
+
+        function handleCheckout() {
+            if (isFixed) {
+                alert("✅ Success! Checkout logic works perfectly.");
+            } else {
+                // Buggy version doesn't usually click well due to CSS overlay, 
+                // but if they manage to click it:
+                alert("❌ Error: Cannot proceed. Invalid Total Amount calculated.");
+            }
+        }
+
+        // Initialize
+        calculateTotal();
+    </script>
+</body>
+</html>

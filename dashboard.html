@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Dashboard UI</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: { bg: '#0f172a', card: '#1e293b', text: '#f8fafc' },
+                        brand: { primary: '#6366f1', secondary: '#06b6d4', accent: '#f43f5e' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animations */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .view-section.active {
+            display: block;
+        }
+        .view-section.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #6366f1;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #6366f1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+    </style>
+</head>
+<body class="bg-dark-bg text-dark-text font-sans antialiased overflow-hidden">
+
+    <div class="flex h-screen w-full">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="absolute z-30 h-full w-64 -translate-x-full bg-dark-bg/90 backdrop-blur-xl border-r border-white/5 transition-transform duration-300 md:static md:translate-x-0 flex flex-col justify-between">
+            <div>
+                <!-- Brand Name: Demo Dashboard -->
+                <div class="h-20 flex items-center justify-center border-b border-white/5">
+                    <h1 class="text-xl font-display font-bold text-white tracking-widest uppercase">
+                        Demo <span class="text-brand-primary">Dashboard</span>
+                    </h1>
+                </div>
+                
+                <nav class="mt-8 px-4 space-y-2">
+                    <!-- Updated initial classes for cleaner JS control -->
+                    <button onclick="switchTab('overview', this)" class="nav-btn w-full flex items-center gap-4 rounded-xl bg-brand-primary text-white px-4 py-3 transition-all hover:scale-105 shadow-lg shadow-brand-primary/25">
+                        <i class="fas fa-th-large w-6"></i> <span class="font-medium">Overview</span>
+                    </button>
+                    <button onclick="switchTab('analytics', this)" class="nav-btn w-full flex items-center gap-4 rounded-xl text-slate-400 hover:bg-white/5 hover:text-brand-secondary px-4 py-3 transition-all">
+                        <i class="fas fa-chart-pie w-6"></i> <span class="font-medium">Analytics</span>
+                    </button>
+                    <button onclick="switchTab('customers', this)" class="nav-btn w-full flex items-center gap-4 rounded-xl text-slate-400 hover:bg-white/5 hover:text-brand-secondary px-4 py-3 transition-all">
+                        <i class="fas fa-users w-6"></i> <span class="font-medium">Customers</span>
+                    </button>
+                    <button onclick="switchTab('sales', this)" class="nav-btn w-full flex items-center gap-4 rounded-xl text-slate-400 hover:bg-white/5 hover:text-brand-secondary px-4 py-3 transition-all">
+                        <i class="fas fa-shopping-cart w-6"></i> <span class="font-medium">Sales</span>
+                    </button>
+                    <button onclick="switchTab('settings', this)" class="nav-btn w-full flex items-center gap-4 rounded-xl text-slate-400 hover:bg-white/5 hover:text-brand-secondary px-4 py-3 transition-all">
+                        <i class="fas fa-cog w-6"></i> <span class="font-medium">Settings</span>
+                    </button>
+                </nav>
+            </div>
+            
+            <div class="p-4">
+                <div class="glass-panel p-4 rounded-xl relative overflow-hidden group cursor-pointer">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <img src="https://ui-avatars.com/api/?name=Shuvo+Mondal&background=random" class="w-10 h-10 rounded-full border border-white/20">
+                        <div>
+                            <p class="text-sm font-bold text-white">Shuvo Mondal</p>
+                            <!-- Role: Demo -->
+                            <p class="text-xs text-brand-secondary uppercase tracking-wider font-bold">Demo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            <!-- Header -->
+            <header class="h-20 flex items-center justify-between px-8 border-b border-white/5 bg-dark-bg/50 backdrop-blur-sm z-20">
+                <button class="md:hidden text-white text-xl" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="hidden md:block">
+                    <p class="text-slate-400 text-sm" id="current-date"></p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <button class="relative text-slate-400 hover:text-white transition">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-brand-accent rounded-full animate-ping"></span>
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-white/10 text-sm text-slate-300 hover:bg-white/5 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </header>
+
+            <!-- Scrollable Content Area -->
+            <div class="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-8 scroll-smooth" id="content-area">
+                
+                <!-- 1. OVERVIEW SECTION -->
+                <div id="overview" class="view-section active fade-in">
+                    <!-- Title: Demo Dashboard UI -->
+                    <h2 class="text-3xl font-display font-bold text-white mb-2">Demo Dashboard UI</h2>
+                    <p class="text-slate-400 mb-8">Real-time data visualization and analytics.</p>
+
+                    <!-- Stats Grid with Counters -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Revenue -->
+                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-primary/20 rounded-full blur-2xl group-hover:bg-brand-primary/40 transition"></div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium">Total Revenue</p>
+                                    <h3 class="text-3xl font-bold text-white mt-1">
+                                        $<span class="counter" data-target="54230">0</span>
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-brand-primary/10 rounded-lg text-brand-primary"><i class="fas fa-dollar-sign text-xl"></i></div>
+                            </div>
+                            <p class="text-green-400 text-sm flex items-center"><i class="fas fa-arrow-up mr-1"></i> +12.5% <span class="text-slate-500 ml-2">vs last month</span></p>
+                        </div>
+
+                        <!-- Active Users -->
+                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-secondary/20 rounded-full blur-2xl group-hover:bg-brand-secondary/40 transition"></div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium">Active Users</p>
+                                    <h3 class="text-3xl font-bold text-white mt-1">
+                                        <span class="counter" data-target="8540">0</span>
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-brand-secondary/10 rounded-lg text-brand-secondary"><i class="fas fa-users text-xl"></i></div>
+                            </div>
+                            <p class="text-green-400 text-sm flex items-center"><i class="fas fa-arrow-up mr-1"></i> +8.2% <span class="text-slate-500 ml-2">vs last month</span></p>
+                        </div>
+
+                        <!-- New Orders -->
+                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl group-hover:bg-purple-500/40 transition"></div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium">New Orders</p>
+                                    <h3 class="text-3xl font-bold text-white mt-1">
+                                        <span class="counter" data-target="1250">0</span>
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-purple-500/10 rounded-lg text-purple-400"><i class="fas fa-shopping-bag text-xl"></i></div>
+                            </div>
+                            <p class="text-brand-accent text-sm flex items-center"><i class="fas fa-arrow-down mr-1"></i> -2.1% <span class="text-slate-500 ml-2">vs last month</span></p>
+                        </div>
+
+                        <!-- Pending Issues -->
+                        <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-accent/20 rounded-full blur-2xl group-hover:bg-brand-accent/40 transition"></div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-slate-400 text-sm font-medium">Pending Issues</p>
+                                    <h3 class="text-3xl font-bold text-white mt-1">
+                                        <span class="counter" data-target="45">0</span>
+                                    </h3>
+                                </div>
+                                <div class="p-3 bg-brand-accent/10 rounded-lg text-brand-accent"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+                            </div>
+                            <p class="text-orange-400 text-sm flex items-center"><i class="fas fa-circle text-[8px] mr-2"></i> Needs Attention</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Chart -->
+                    <div class="glass-panel p-6 rounded-2xl mb-8">
+                        <h3 class="text-lg font-bold text-white mb-6">Revenue Analytics</h3>
+                        <div class="relative h-72 w-full">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ANALYTICS SECTION -->
+                <div id="analytics" class="view-section">
+                    <h2 class="text-3xl font-display font-bold text-white mb-6">Detailed Analytics</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Traffic Source -->
+                        <div class="glass-panel p-6 rounded-2xl lg:col-span-1">
+                            <h3 class="text-white font-bold mb-4">Traffic Sources</h3>
+                            <div class="relative h-64 flex justify-center">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
+                            <div class="mt-4 space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-400 flex items-center"><span class="w-3 h-3 rounded-full bg-brand-primary mr-2"></span> Direct</span>
+                                    <span class="text-white font-bold">45%</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-400 flex items-center"><span class="w-3 h-3 rounded-full bg-brand-secondary mr-2"></span> Social</span>
+                                    <span class="text-white font-bold">30%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Demographics -->
+                        <div class="glass-panel p-6 rounded-2xl lg:col-span-2">
+                            <h3 class="text-white font-bold mb-6">User Demographics</h3>
+                            <div class="space-y-6">
+                                <!-- Item -->
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-slate-300">USA</span>
+                                        <span class="text-brand-secondary">85%</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-secondary w-[85%] rounded-full shadow-[0_0_10px_#06b6d4]"></div>
+                                    </div>
+                                </div>
+                                <!-- Item -->
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-slate-300">Europe</span>
+                                        <span class="text-brand-primary">65%</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-primary w-[65%] rounded-full shadow-[0_0_10px_#6366f1]"></div>
+                                    </div>
+                                </div>
+                                <!-- Item -->
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-slate-300">Asia</span>
+                                        <span class="text-brand-accent">40%</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-accent w-[40%] rounded-full shadow-[0_0_10px_#f43f5e]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. CUSTOMERS SECTION -->
+                <div id="customers" class="view-section">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-display font-bold text-white">Customers</h2>
+                        <button class="bg-brand-primary px-4 py-2 rounded-lg text-white text-sm hover:bg-brand-primary/80 transition shadow-lg shadow-brand-primary/30">
+                            <i class="fas fa-plus mr-2"></i> Add New
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Customer Card 1 -->
+                        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-2 transition duration-300">
+                            <div class="w-20 h-20 rounded-full p-1 border-2 border-brand-primary mb-4 relative">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-full h-full rounded-full object-cover">
+                                <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-dark-card rounded-full"></span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Sarah Jenkins</h3>
+                            <p class="text-sm text-slate-400 mb-4">sarah@example.com</p>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-1.5 rounded-full border border-white/10 text-xs text-white hover:bg-white/10 transition">Profile</button>
+                                <button class="px-4 py-1.5 rounded-full bg-brand-primary/10 text-xs text-brand-primary hover:bg-brand-primary hover:text-white transition">Message</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Customer Card 2 -->
+                        <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-2 transition duration-300">
+                            <div class="w-20 h-20 rounded-full p-1 border-2 border-slate-600 mb-4 relative">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full rounded-full object-cover">
+                                <span class="absolute bottom-1 right-1 w-4 h-4 bg-gray-500 border-2 border-dark-card rounded-full"></span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Mike Ross</h3>
+                            <p class="text-sm text-slate-400 mb-4">mike.r@example.com</p>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-1.5 rounded-full border border-white/10 text-xs text-white hover:bg-white/10 transition">Profile</button>
+                                <button class="px-4 py-1.5 rounded-full bg-brand-primary/10 text-xs text-brand-primary hover:bg-brand-primary hover:text-white transition">Message</button>
+                            </div>
+                        </div>
+
+                         <!-- Customer Card 3 -->
+                         <div class="glass-panel p-6 rounded-2xl flex flex-col items-center text-center hover:-translate-y-2 transition duration-300">
+                            <div class="w-20 h-20 rounded-full p-1 border-2 border-brand-secondary mb-4 relative">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-full h-full rounded-full object-cover">
+                                <span class="absolute bottom-1 right-1 w-4 h-4 bg-yellow-500 border-2 border-dark-card rounded-full"></span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Emily Blunt</h3>
+                            <p class="text-sm text-slate-400 mb-4">emily@example.com</p>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-1.5 rounded-full border border-white/10 text-xs text-white hover:bg-white/10 transition">Profile</button>
+                                <button class="px-4 py-1.5 rounded-full bg-brand-primary/10 text-xs text-brand-primary hover:bg-brand-primary hover:text-white transition">Message</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. SALES SECTION -->
+                <div id="sales" class="view-section">
+                    <h2 class="text-3xl font-display font-bold text-white mb-6">Recent Transactions</h2>
+                    
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white/5 text-slate-400 text-sm uppercase tracking-wider">
+                                    <th class="p-6 font-medium">Product</th>
+                                    <th class="p-6 font-medium">Date</th>
+                                    <th class="p-6 font-medium">Amount</th>
+                                    <th class="p-6 font-medium">Status</th>
+                                    <th class="p-6 font-medium text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5 text-slate-300">
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="p-6 flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded bg-blue-900 flex items-center justify-center text-blue-300"><i class="fas fa-cube"></i></div>
+                                        <span class="font-medium text-white">Premium Plan</span>
+                                    </td>
+                                    <td class="p-6">Oct 24, 2024</td>
+                                    <td class="p-6 font-bold text-white">$120.00</td>
+                                    <td class="p-6"><span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs">Paid</span></td>
+                                    <td class="p-6 text-right"><button class="text-slate-400 hover:text-white"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="p-6 flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded bg-purple-900 flex items-center justify-center text-purple-300"><i class="fas fa-layer-group"></i></div>
+                                        <span class="font-medium text-white">UI Kit Bundle</span>
+                                    </td>
+                                    <td class="p-6">Oct 23, 2024</td>
+                                    <td class="p-6 font-bold text-white">$49.00</td>
+                                    <td class="p-6"><span class="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs">Pending</span></td>
+                                    <td class="p-6 text-right"><button class="text-slate-400 hover:text-white"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="p-6 flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded bg-pink-900 flex items-center justify-center text-pink-300"><i class="fas fa-tools"></i></div>
+                                        <span class="font-medium text-white">Maintenance</span>
+                                    </td>
+                                    <td class="p-6">Oct 21, 2024</td>
+                                    <td class="p-6 font-bold text-white">$350.00</td>
+                                    <td class="p-6"><span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs">Failed</span></td>
+                                    <td class="p-6 text-right"><button class="text-slate-400 hover:text-white"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 5. SETTINGS SECTION -->
+                <div id="settings" class="view-section">
+                    <h2 class="text-3xl font-display font-bold text-white mb-6">Settings</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Profile Settings -->
+                        <div class="glass-panel p-8 rounded-2xl">
+                            <h3 class="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Profile Information</h3>
+                            <form>
+                                <div class="mb-4">
+                                    <label class="block text-slate-400 text-sm mb-2">Full Name</label>
+                                    <input type="text" value="Shuvo Mondal" class="w-full bg-dark-bg border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-brand-primary transition">
+                                </div>
+                                <div class="mb-6">
+                                    <label class="block text-slate-400 text-sm mb-2">Email Address</label>
+                                    <input type="email" value="demo@dashboard.com" class="w-full bg-dark-bg border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-brand-primary transition">
+                                </div>
+                                <button class="bg-brand-primary px-6 py-3 rounded-lg text-white font-medium hover:bg-brand-primary/90 transition shadow-lg">Save Changes</button>
+                            </form>
+                        </div>
+
+                        <!-- Preferences -->
+                        <div class="glass-panel p-8 rounded-2xl">
+                            <h3 class="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Preferences</h3>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-white font-medium">Email Notifications</p>
+                                        <p class="text-slate-400 text-xs">Receive daily summary emails</p>
+                                    </div>
+                                    <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" name="toggle" id="toggle1" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-dark-card appearance-none cursor-pointer transition-all duration-300"/>
+                                        <label for="toggle1" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer"></label>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-white font-medium">Two-Factor Auth</p>
+                                        <p class="text-slate-400 text-xs">Add extra security to account</p>
+                                    </div>
+                                    <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                        <input type="checkbox" name="toggle" id="toggle2" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-dark-card appearance-none cursor-pointer transition-all duration-300" checked/>
+                                        <label for="toggle2" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-700 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 hidden md:hidden"></div>
+    </div>
+
+    <script>
+        // --- 1. Navigation & Tab Switching Logic ---
+        function switchTab(tabId, btnElement) {
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active', 'fade-in');
+                setTimeout(() => {
+                    if(!section.classList.contains('active')) section.style.display = 'none';
+                }, 400); // Wait for fade out
+            });
+
+            // Active/Inactive Class Definitions (For better control)
+            const activeClasses = ['bg-brand-primary', 'text-white', 'shadow-lg', 'hover:scale-105', 'shadow-brand-primary/25'];
+            const inactiveClasses = ['text-slate-400', 'hover:bg-white/5', 'hover:text-brand-secondary'];
+
+            // Update Sidebar Active State (MODIFIED SECTION)
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                // Remove ALL active classes
+                btn.classList.remove(...activeClasses);
+                // Remove any conflicting inactive classes and then add base inactive state
+                btn.classList.remove(...inactiveClasses); 
+                btn.classList.add(...inactiveClasses);
+            });
+            
+            // Apply Active State to the clicked button
+            btnElement.classList.remove(...inactiveClasses); // Remove inactive classes
+            btnElement.classList.add(...activeClasses); // Add active classes
+
+            // Show Target Section
+            const target = document.getElementById(tabId);
+            target.style.display = 'block';
+            
+            // Trigger Reflow for Animation
+            setTimeout(() => {
+                target.classList.add('active', 'fade-in');
+                // Retrigger counters if going back to overview
+                if(tabId === 'overview') startCounters();
+            }, 50);
+
+            // Close mobile sidebar if open
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // --- 2. Mobile Sidebar Logic ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // --- 3. Number Counter Animation Logic ---
+        function startCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200; // The lower the slower
+
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText.replace(/,/g, ''); // Remove commas for calculation
+                    
+                    const inc = target / 50; // Break into 50 frames
+
+                    if (count < target) {
+                        // Format number with commas
+                        counter.innerText = Math.ceil(count + inc).toLocaleString();
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target.toLocaleString();
+                    }
+                };
+                // Reset to 0 before starting for effect
+                counter.innerText = '0';
+                updateCount();
+            });
+        }
+
+        // --- 4. Chart.js Configurations ---
+        
+        // Main Revenue Chart
+        const ctxMain = document.getElementById('mainChart').getContext('2d');
+        const gradient = ctxMain.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+        new Chart(ctxMain, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [15000, 22000, 18000, 32000, 28000, 45000, 42000, 54000],
+                    borderColor: '#6366f1',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#1e293b',
+                    pointBorderColor: '#6366f1',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+
+        // Traffic Sources Doughnut Chart
+        const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+        new Chart(ctxTraffic, {
+            type: 'doughnut',
+            data: {
+                labels: ['Direct', 'Social', 'Referral'],
+                datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: ['#6366f1', '#06b6d4', '#f43f5e'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '75%'
+            }
+        });
+
+        // --- 5. Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set Date
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', dateOptions);
+            
+            // Start Animation
+            startCounters();
+        });
+
+    </script>
+</body>
+</html>

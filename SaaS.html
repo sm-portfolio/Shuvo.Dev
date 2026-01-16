@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo SaaS Landing Page | Modern Software Demo</title>
+    
+    <!-- Google Fonts: Poppins (Sans) & Space Grotesk (Display) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config for Custom Colors & Dark Mode setup -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable dark mode using the 'dark' class on the HTML tag
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            primary: '#6366f1', // Indigo (Main Brand Color)
+                            accent: '#06b6d4',  // Cyan (Secondary Accent)
+                            light: '#f8fafc',
+                            'dark-bg': '#0f172a',
+                            'light-bg': '#ffffff'
+                        },
+                        'card-bg': 'rgba(30, 41, 59, 0.7)', // Dark card background for contrast
+                    },
+                    backgroundImage: {
+                        'hero-gradient': 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles for dark mode */
+        body {
+            background-color: #0f172a; /* brand-dark-bg */
+            color: #f8fafc; /* brand-light */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Light mode overrides */
+        .light body {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        /* General styling for cards, adjusted for light mode contrast */
+        .pop-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .pop-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+        }
+
+        /* Light mode card adjustments */
+        .light .pop-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .light .pop-card:hover {
+            box-shadow: 0 20px 25px -5px rgba(6, 182, 212, 0.2); /* Cyan shadow on hover */
+            border-color: #06b6d4;
+        }
+
+        /* Reusing your custom blob style for visual flair */
+        .blob-bg {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+    </style>
+</head>
+<body class="relative overflow-x-hidden">
+
+    <!-- Background Blobs -->
+    <div class="blob-bg bg-brand-primary w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2 hidden md:block"></div>
+    <div class="blob-bg bg-brand-accent w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/2 translate-y-1/2 hidden md:block" style="animation-delay: 2s;"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300 backdrop-blur-lg bg-brand-dark/90 dark:bg-brand-dark/90 light:bg-white/90 border-b border-white/10 dark:border-white/10 light:border-black/10" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#hero" class="text-2xl font-display font-bold text-white dark:text-white light:text-brand-dark tracking-wider">
+                DEMO<span class="text-brand-accent">.SaaS</span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center text-white dark:text-white light:text-brand-dark">
+                <!-- Added 'nav-link' class for JS targeting -->
+                <a href="#features" class="nav-link hover:text-brand-accent transition-colors">Features</a>
+                <a href="#howitworks" class="nav-link hover:text-brand-accent transition-colors">How It Works</a>
+                <a href="#pricing" class="nav-link hover:text-brand-accent transition-colors">Pricing</a>
+                <a href="#testimonials" class="nav-link hover:text-brand-accent transition-colors">Reviews</a>
+                
+                <!-- Dark Mode Toggle Button -->
+                <button id="darkModeToggle" class="p-2 rounded-full text-brand-accent hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-brand-dark/10 transition-colors">
+                    <i class="fas fa-sun dark:hidden light:block"></i>
+                    <i class="fas fa-moon hidden dark:block"></i>
+                </button>
+                
+                <!-- Removed: Get Started Button -->
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-2xl text-white dark:text-white light:text-brand-dark" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu Dropdown (Hidden by default) -->
+        <div class="md:hidden hidden bg-brand-dark dark:bg-brand-dark light:bg-white border-b border-white/10 dark:border-white/10 light:border-black/10" id="mobileMenu">
+            <div class="flex flex-col p-4 space-y-4 text-center text-white dark:text-white light:text-brand-dark">
+                <!-- Added 'nav-link' class for JS targeting -->
+                <a href="#features" class="nav-link block hover:text-brand-accent" onclick="toggleMenu()">Features</a>
+                <a href="#howitworks" class="nav-link block hover:text-brand-accent" onclick="toggleMenu()">How It Works</a>
+                <a href="#pricing" class="nav-link block hover:text-brand-accent" onclick="toggleMenu()">Pricing</a>
+                <a href="#testimonials" class="nav-link block hover:text-brand-accent" onclick="toggleMenu()">Reviews</a>
+                <!-- Removed: Get Started Link -->
+                <button id="mobileDarkModeToggle" class="w-full py-2 flex items-center justify-center text-brand-accent hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-brand-dark/10 transition-colors">
+                    <i class="fas fa-sun dark:hidden light:block mr-2"></i>
+                    <i class="fas fa-moon hidden dark:block mr-2"></i>
+                    Toggle Dark/Light Mode
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center justify-center pt-32 pb-16 relative overflow-hidden bg-hero-gradient dark:bg-hero-gradient light:bg-brand-light">
+        <div class="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center gap-12">
+            
+            <!-- Text Content -->
+            <div class="lg:w-1/2 text-center lg:text-left z-10" data-aos="fade-right">
+                <p class="text-brand-accent font-mono mb-4 text-lg uppercase tracking-widest">A Modern Demo Service</p>
+                <h1 class="text-5xl md:text-7xl font-display font-bold mb-6 leading-tight text-white dark:text-white light:text-brand-dark">
+                    The Ultimate <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent">SaaS Landing Page</span> Demo
+                </h1>
+                <p class="text-gray-400 dark:text-gray-400 light:text-gray-600 text-xl mb-10 max-w-xl mx-auto lg:mx-0">
+                    This is a highly-converting, responsive, and animated demonstration of a modern SaaS application landing page.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="#pricing" class="px-10 py-4 bg-brand-primary rounded-xl font-bold text-white shadow-lg shadow-brand-primary/40 hover:scale-105 transition-transform text-center text-lg">
+                        Start 14-Day Free Trial
+                    </a>
+                    <a href="#features" class="px-10 py-4 border border-white/20 dark:border-white/20 light:border-brand-dark/20 rounded-xl font-bold hover:bg-white/10 dark:hover:bg-white/10 light:hover:bg-brand-dark/10 transition-colors text-center text-lg text-white dark:text-white light:text-brand-dark">
+                        See Features
+                    </a>
+                </div>
+            </div>
+
+            <!-- Image Content (Product Mockup) -->
+            <div class="lg:w-1/2 flex justify-center relative" data-aos="zoom-in" data-aos-delay="300">
+                <img src="https://placehold.co/600x400/1e293b/FFF?text=Demo+SaaS+Dashboard" alt="Product Mockup" class="w-full max-w-lg rounded-2xl shadow-2xl border border-brand-accent/30 transform hover:scale-[1.02] transition-transform duration-500">
+                <!-- Floating Icon 1 -->
+                <div class="absolute -top-4 left-1/4 bg-gray-800 dark:bg-gray-800 light:bg-white p-3 rounded-full shadow-xl animate-pulse" style="animation-duration: 2s;" data-aos="zoom-in" data-aos-delay="800">
+                    <i class="fas fa-bolt text-yellow-400 text-2xl"></i>
+                </div>
+                <!-- Floating Icon 2 -->
+                <div class="absolute -bottom-4 right-1/4 bg-gray-800 dark:bg-gray-800 light:bg-white p-3 rounded-full shadow-xl animate-pulse" style="animation-duration: 2s; animation-delay: 1s;" data-aos="zoom-in" data-aos-delay="1000">
+                    <i class="fas fa-code-branch text-green-400 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-black/20 dark:bg-black/20 light:bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-display font-bold mb-4 text-white dark:text-white light:text-brand-dark">Core Features Demonstrated</h2>
+                <div class="w-20 h-1 bg-brand-accent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="pop-card p-8 rounded-2xl" data-aos="flip-up" data-aos-delay="100">
+                    <div class="w-14 h-14 bg-brand-primary/20 rounded-lg flex items-center justify-center mb-6 text-brand-primary text-3xl">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 dark:text-white light:text-brand-dark">Pixel-Perfect UI</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Showcases modern and clean UI design built meticulously with Tailwind CSS.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="pop-card p-8 rounded-2xl" data-aos="flip-up" data-aos-delay="200">
+                    <div class="w-14 h-14 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 text-green-400 text-3xl">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 dark:text-white light:text-brand-dark">Full Responsiveness</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Ensuring the layout is flawless on all screen sizes: mobile, tablet, and desktop.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="pop-card p-8 rounded-2xl" data-aos="flip-up" data-aos-delay="300">
+                    <div class="w-14 h-14 bg-brand-accent/20 rounded-lg flex items-center justify-center mb-6 text-brand-accent text-3xl">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 dark:text-white light:text-brand-dark">Dark/Light Mode</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">A smooth and easy-to-use toggle for switching between themes effortlessly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="howitworks" class="py-24">
+        <div class="container mx-auto px-6 max-w-5xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-display font-bold mb-4 dark:text-white light:text-brand-dark">3 Simple Steps of the Demo</h2>
+                <div class="w-20 h-1 bg-brand-primary mx-auto rounded-full"></div>
+            </div>
+
+            <div class="relative flex flex-col md:flex-row justify-between items-center space-y-12 md:space-y-0">
+                <!-- Connector Line -->
+                <div class="absolute hidden md:block w-3/4 h-1 bg-gray-700 dark:bg-gray-700 light:bg-gray-300 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                <div class="absolute hidden md:block w-3/4 h-1 bg-brand-accent/50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-1000" data-aos="fade-right" data-aos-delay="500"></div>
+
+                <!-- Step 1 -->
+                <div class="text-center relative z-10 w-full md:w-1/3" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="w-16 h-16 mx-auto bg-brand-primary rounded-full flex items-center justify-center text-white text-3xl mb-4 font-bold border-4 border-brand-dark/50 dark:border-brand-dark light:border-white">
+                        1
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white light:text-brand-dark">View The Design</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Observe the modern UI/UX principles and structure.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center relative z-10 w-full md:w-1/3" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="w-16 h-16 mx-auto bg-brand-accent rounded-full flex items-center justify-center text-white text-3xl mb-4 font-bold border-4 border-brand-dark/50 dark:border-brand-dark light:border-white">
+                        2
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white light:text-brand-dark">Interact With Features</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Toggle dark mode and observe the scroll animations.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center relative z-10 w-full md:w-1/3" data-aos="zoom-in" data-aos-delay="500">
+                    <div class="w-16 h-16 mx-auto bg-brand-primary rounded-full flex items-center justify-center text-white text-3xl mb-4 font-bold border-4 border-brand-dark/50 dark:border-brand-dark light:border-white">
+                        3
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 dark:text-white light:text-brand-dark">Review The Code</h3>
+                    <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Check the clean, component-based structure on GitHub.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 bg-black/20 dark:bg-black/20 light:bg-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-display font-bold mb-4 dark:text-white light:text-brand-dark">Demo Pricing Structure</h2>
+                <div class="w-20 h-1 bg-brand-accent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                
+                <!-- Pricing Card 1: Basic -->
+                <div class="pop-card p-10 rounded-2xl text-center flex flex-col items-center dark:bg-gray-900/70 light:bg-white/70" data-aos="zoom-in" data-aos-delay="100">
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white light:text-brand-dark">Basic</h3>
+                    <p class="text-gray-500 mb-6">Demo Standard Features</p>
+                    <p class="text-5xl font-display font-bold mb-2 dark:text-white light:text-brand-dark">$19<span class="text-lg text-gray-500">/mo</span></p>
+                    <p class="text-sm text-brand-accent mb-8">Billed annually</p>
+
+                    <ul class="text-left space-y-3 mb-10 w-full">
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> 5 Active Projects</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> Standard Security</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> Email Support</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-times-circle text-gray-500 mr-3 opacity-50"></i> Custom Domains</li>
+                    </ul>
+
+                    <a href="#" class="w-full py-3 border border-brand-primary text-brand-primary rounded-xl font-bold hover:bg-brand-primary hover:text-white transition-all mt-auto">Choose Basic</a>
+                </div>
+
+                <!-- Pricing Card 2: Pro (Highlighted) -->
+                <div class="pop-card p-10 rounded-2xl text-center flex flex-col items-center border-4 border-brand-accent transform scale-[1.05] shadow-2xl dark:bg-gray-800/90 light:bg-white/90" data-aos="zoom-in" data-aos-delay="300">
+                    <span class="px-4 py-1 bg-brand-accent text-white rounded-full text-xs font-bold uppercase mb-4">Most Popular</span>
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white light:text-brand-dark">Pro</h3>
+                    <p class="text-gray-500 mb-6">Demo Advanced Features</p>
+                    <p class="text-6xl font-display font-bold mb-2 text-brand-accent dark:text-brand-accent light:text-brand-dark">$49<span class="text-xl text-gray-500">/mo</span></p>
+                    <p class="text-sm text-brand-primary mb-8">Billed annually</p>
+
+                    <ul class="text-left space-y-3 mb-10 w-full">
+                        <li class="dark:text-white light:text-brand-dark font-semibold flex items-center"><i class="fas fa-check-circle text-brand-accent mr-3"></i> **Unlimited** Projects</li>
+                        <li class="dark:text-white light:text-brand-dark font-semibold flex items-center"><i class="fas fa-check-circle text-brand-accent mr-3"></i> **Advanced** Security</li>
+                        <li class="dark:text-white light:text-brand-dark font-semibold flex items-center"><i class="fas fa-check-circle text-brand-accent mr-3"></i> 24/7 Priority Support</li>
+                        <li class="dark:text-white light:text-brand-dark font-semibold flex items-center"><i class="fas fa-check-circle text-brand-accent mr-3"></i> Custom Domains</li>
+                    </ul>
+
+                    <a href="#" class="w-full py-4 bg-brand-accent text-white rounded-xl font-bold hover:bg-brand-primary shadow-lg shadow-brand-accent/40 transition-all mt-auto">Get Pro Plan</a>
+                </div>
+
+                <!-- Pricing Card 3: Enterprise -->
+                <div class="pop-card p-10 rounded-2xl text-center flex flex-col items-center dark:bg-gray-900/70 light:bg-white/70" data-aos="zoom-in" data-aos-delay="500">
+                    <h3 class="text-2xl font-bold mb-4 dark:text-white light:text-brand-dark">Enterprise</h3>
+                    <p class="text-gray-500 mb-6">Demo Custom Features</p>
+                    <p class="text-5xl font-display font-bold mb-2 dark:text-white light:text-brand-dark">Custom</p>
+                    <p class="text-lg text-gray-500 mb-8">Contact us for pricing</p>
+
+                    <ul class="text-left space-y-3 mb-10 w-full">
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> All Pro Features</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> Dedicated Account Manager</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> On-premise Deployment</li>
+                        <li class="dark:text-gray-300 light:text-gray-700 flex items-center"><i class="fas fa-check-circle text-brand-primary mr-3"></i> **SLA** Guarantee</li>
+                    </ul>
+
+                    <a href="#cta" class="w-full py-3 border border-brand-primary text-brand-primary rounded-xl font-bold hover:bg-brand-primary hover:text-white transition-all mt-auto">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-4xl font-display font-bold dark:text-white light:text-brand-dark">Client Testimonial (Placeholder)</h2>
+                <i class="fas fa-quote-left text-5xl text-brand-primary/20 mt-4"></i>
+            </div>
+            
+            <div class="relative pop-card p-8 md:p-12 text-center dark:bg-gray-900/70 light:bg-gray-100/70" data-aos="zoom-in">
+                <p class="text-xl italic text-gray-300 dark:text-gray-300 light:text-gray-700 mb-6">
+                    "This landing page demo is a perfect example of modern, high-quality front-end development. The responsiveness and dark mode are implemented flawlessly."
+                </p>
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 rounded-full bg-gray-600 mb-3 overflow-hidden">
+                         <img src="https://randomuser.me/api/portraits/men/78.jpg" alt="Client" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="font-bold dark:text-white light:text-brand-dark">Upwork Client</h4>
+                    <span class="text-brand-accent text-sm">Satisfied Customer (Placeholder)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section id="cta" class="py-24 bg-brand-primary/20 dark:bg-brand-primary/20 light:bg-brand-primary/10">
+        <div class="container mx-auto px-6 max-w-4xl text-center" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-display font-bold mb-6 text-brand-dark dark:text-white light:text-brand-dark">
+                Like What You See? Let's Build!
+            </h2>
+            <p class="text-xl text-gray-600 dark:text-gray-300 light:text-gray-700 mb-10">
+                Hire me on Upwork to build your own high-converting, custom landing page.
+            </p>
+            <!-- Removed: Contact Shuvo Mondal Now Button -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center border-t border-white/5 dark:border-white/5 light:border-black/5 bg-brand-dark dark:bg-brand-dark light:bg-white">
+        <p class="text-gray-500 text-sm">© 2024 Demo SaaS Landing Page. All rights reserved. | Developed by **Shuvo Mondal**</p>
+        <div class="mt-4 flex justify-center space-x-4 text-gray-500">
+            <!-- Placeholder for your social links -->
+            <a href="#" class="hover:text-brand-accent"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="hover:text-brand-accent"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="hover:text-brand-accent"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-8 right-8 bg-brand-primary text-white p-4 rounded-full shadow-lg opacity-0 transition-opacity duration-300 hover:bg-brand-primary/80 z-40">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS Animation Library
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 120
+        });
+
+        // Dark Mode Toggle Logic
+        const htmlElement = document.documentElement;
+        const desktopToggle = document.getElementById('darkModeToggle');
+        const mobileToggle = document.getElementById('mobileDarkModeToggle');
+
+        // Check for theme in localStorage or default to dark
+        if (localStorage.getItem('theme') === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            htmlElement.classList.remove('dark');
+            htmlElement.classList.add('light');
+        } else {
+            htmlElement.classList.add('dark');
+            htmlElement.classList.remove('light');
+        }
+
+        function toggleDarkMode() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        desktopToggle.addEventListener('click', toggleDarkMode);
+        mobileToggle.addEventListener('click', toggleDarkMode);
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        function toggleMenu() {
+            mobileMenu.classList.toggle('hidden');
+            // Change icon from bars to times (X)
+            menuBtn.querySelector('i').classList.toggle('fa-bars');
+            menuBtn.querySelector('i').classList.toggle('fa-times');
+        }
+        menuBtn.addEventListener('click', toggleMenu);
+
+        // Scroll to Top Button Logic
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                scrollTopBtn.classList.remove('opacity-0');
+            } else {
+                scrollTopBtn.classList.add('opacity-0');
+            }
+        });
+
+        // ===============================================
+        // ACTIVE NAV LINK (SCROLL SPY) LOGIC 
+        // ===============================================
+        const navLinks = document.querySelectorAll('.nav-link');
+        // Select all sections that have an ID and are intended to be part of the navigation
+        const sections = document.querySelectorAll('section[id]'); 
+        const navbarHeight = 90; // Approximate height of the fixed navbar
+
+        function setActiveLink() {
+            let current = 'hero'; // Default to hero section
+
+            // Find the section currently in view
+            sections.forEach(section => {
+                // Determine the scroll position offset by the navbar height
+                // The +10 is to slightly bias the check to the current section
+                const sectionTop = section.offsetTop - navbarHeight + 10;
+                
+                // Check if the current scroll position is within the section boundaries
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            // Remove active class (text-brand-accent) from all links
+            navLinks.forEach(link => {
+                link.classList.remove('text-brand-accent');
+            });
+
+            // Add active class (text-brand-accent) to the current link
+            if (current) {
+                navLinks.forEach(link => {
+                    // Check if the link's href contains the current section ID
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('text-brand-accent');
+                    }
+                });
+            }
+        }
+
+        // Initial call and attach to scroll event
+        window.addEventListener('scroll', setActiveLink);
+        setActiveLink(); // Run on load to set the initial state
+
+        // Also update active class when a link is clicked (for smoother visual update during smooth scroll)
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Wait a moment for scroll to complete before calling setActiveLink
+                setTimeout(setActiveLink, 350); 
+            });
+        });
+    </script>
+</body>
+</html>
